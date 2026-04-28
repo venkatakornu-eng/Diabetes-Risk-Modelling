@@ -113,6 +113,28 @@ Models were evaluated using:
 ⚠️ **Important Insight:**
 Despite high accuracy (~86–87%), models showed poor performance in detecting diabetes cases due to class imbalance, highlighting limitations of accuracy as a sole metric.
 
+## 📊 Model Performance
+
+![Model Performance](outputs/plots/Screenshot1.png)
+
+BMI is the most significant predictor of diabetes, followed by age, high cholesterol, and income, according to the random forest model's variable importance plot. While lifestyle factors like fruit and vegetable consumption, physical activity, and smoking have a smaller but noticeable impact, blood pressure and education also make a moderate contribution to the model. The least significant factor seems to be heavy drinking. Overall, the findings show that clinical and biological factors are more important in predicting diabetes than lifestyle factors.
+
+---
+
+## 📉 Clustering Results
+
+![Cluster Plot](outputs/plots/Screenshot2.png)
+
+The K-means clustering results indicate that individuals are categorized into three distinct clusters according to their characteristics. There is some overlap between clusters, but there are clear patterns that show differences in profiles like age, BMI, and lifestyle factors. These clusters help find groups of people who have similar risk patterns. These groups can then be studied more closely to see how they are related to diabetes outcomes
+
+---
+
+## 🌳 Random Forest Tree
+
+![Random Forest Tree](outputs/plots/Screenshot3.png)
+
+The decision tree says that age and BMI are the two most important things to look at when trying to figure out if someone has diabetes. People who are older and have a higher BMI are more likely to have diabetes. Income is another factor, with people who make less money being more likely to get sick. The tree shows how biological and socioeconomic factors work together to affect diabetes outcomes.
+
 ---
 
 ## 🔍 Key Findings
