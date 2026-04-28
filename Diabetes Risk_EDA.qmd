@@ -1,0 +1,390 @@
+---
+title: "MA7442 Assessment 1 - Task 1"
+format: html
+---
+
+# AIM :
+
+-   The aim of this study is to Examining the **socioeconomic**, **behavioral**, and **demographic characteristics** linked to diabetes prevalence in the study population as well as identifying important predictors that might influence variation in **diabetes status** are the goals of this research.
+
+# Objectives :
+
+-   To examine the distribution of diabetes status within the dataset.
+
+-   To explore the relationships between diabetes and demographic variables like **gender** and **age**.
+
+-   To evaluate the connection between **biological risk factors**, specifically **BMI**, and **diabetes**.
+
+-   To explore into the relationship between the prevalence of diabetes and lifestyle choices (such as **diet** and **alcohol** use).
+
+-   To explore the relationship between diabetes risk and socioeconomic factors, such as **income level**.
+
+-   To employ multivariable modeling to identify the variables that, after adjusting for confounding variables, independently predict diabetes. (**Task 2**)
+
+## Dataset
+
+### Read in Package and data
+
+```{r}
+#| warning: false
+
+library(tidyverse)
+library(ggplot2)
+library(dplyr)
+library(reshape2)
+
+```
+
+```{r}
+data = read.csv("data/dataset1.csv")
+
+```
+
+## Overview
+
+The dataset chosen for this research contains healthcare statistics and lifestyle survey information from the US as well as diabetic state.
+
+-   It contains **253,680** rows and **22** columns with **zero** missing values.
+
+-   It takes into account factors like **age**, **body mass index (BMI)**, **alcohol** and **fruit intake**, **income** and **diabetes**.
+
+-   Most of the values in feature classified as **0's** and **1's** which means **no** and **yes**.
+
+
+```{r}
+head(data)
+```
+
+
+```{r}
+dim(data)
+```
+
+
+```{r}
+data[data == "" | data == "?"] <- NA
+colSums(is.na(data))
+```
+
+```{r}
+table(data$Diabetes_012)
+table(data$HighBP)
+table(data$HighChol)
+table(data$Smoker)
+
+```
+
+-   The majority of people (**n = 213,703**) do not have diabetes. Prediabetes cases make up the smallest group (**n=4,631**) and only **35,346** cases are diabetes. it will affect classification performance and This **imbalance** should be taken into account in later modeling.
+
+-   With **112,423** people identified as smokers and **141,257** people are non-smokers.
+
+# Data Preprocessing
+
+```{r}
+data$Age <- factor(data$Age,
+                   levels = 1:13,
+                   labels = c("18-24","25-29","30-34","35-39","40-44","45-49","50-54","55-59","60-64","65-69","70-74","75-79","80+"),
+                   ordered = TRUE
+)
+
+```
+
+-   Initially, the age variable was numerically coded from level 1 to 13 but those number are age groups and not real ages,So convert it into a **categorical variable**.
+
+```{r}
+data$Education <- factor(data$Education,
+                         levels = 1:6,
+                         labels = c("Never attended school or
+only kindergarten", "Grades 1-8","Grades 9-11", "Grade 12" ,"College 1 year-3 years", "College graduate" ),
+ordered = TRUE
+
+                         
+  
+)
+```
+
+```{r}
+data$GenHlth <- factor(data$GenHlth,
+                       levels = 1:5,
+                       labels = c("excellent", "very good","good","fair","poor"),
+                       ordered = TRUE
+  
+)
+```
+
+```{r}
+data$Income <- factor(data$Income,
+  levels = 1:8,
+  labels = c("<$10k", "$10k-15k", "$15k-20K","$20k-25k", "$25-35K", "$35k-40k","$40-75k",  "+$75k"),
+  ordered = TRUE
+)
+```
+
+```{r}
+table(data$Age)
+table(data$Education)
+table(data$GenHlth)
+table(data$Income)
+table(data$Sex)
+```
+
+-   The middle and older age groups make up the majority of age distribution with 60-64 and 65-69 age groups shows highest frequencies.
+
+-   Majority are college graduates - 107,325
+
+-   Most of the report **Very Good** or **Good** in General health level .
+
+-   There are *90,385* people who earn more than *\$75k*.
+
+-   There are **141,974** Female count in data and **111,706** male count in data. This shows it's relatively balanced by sex.
+
+```{r}
+summary(data)
+```
+
+```{r}
+table(data$Diabetes_012)
+prop.table(table(data$Diabetes_012))
+```
+
+# Data Visualization
+
+## Distribution of age
+
+```{r}
+ggplot(data, aes(x= Age))+
+  geom_bar(fill= "darkgreen")+
+  labs(title =  "Distribution of Age",
+         x = "Age")
+
+```
+
+```{r}
+ggplot(data, aes(x= factor(Diabetes_012), fill = factor(Diabetes_012)))+
+  geom_bar(position = "dodge")+
+  labs(title = "Distribution of Diabetes",
+       x= "Diabetes",
+       y= "frequency")
+```
+
+-   The bar Graph distribution shows frequency of diabetes. There is a huge amount of data which as no diabetes and less as diabetes.This is imbalanced.
+
+## Distribution of BMI
+
+```{r}
+
+ggplot(data,aes(x= BMI))+
+  geom_histogram(aes(y= ..density..),
+                 bandwith=2,fill= "lightgreen",color= "orange")+
+  stat_function(fun= dnorm,
+          args= list(mean= mean(data$BMI),
+                     sd= sd(data$BMI)),
+    color = "red", linewidth=1)+
+  labs(
+    title = "Boby mass index",
+    x = "BMI", 
+    y = "Density"
+  )
+```
+
+-   The Histogram shows **Body Mass Index** (BMI) values with density curve.The distribution is **right-skewed**(positively skewed).Tells most values are in lower end and less values in tail part.
+
+```{r}
+ggplot(data, aes(x = factor(Diabetes_012),y = BMI, fill= factor(Diabetes_012)))+
+  geom_boxplot()+
+  labs(
+    title =  "BMI Distribution by Diabetes",
+    x = "Diabetes",
+    y = "BMI"
+  )
+        
+```
+
+-   We can see lot of outliers in Boxplot which we remove in task2.
+
+## Age vs Diabetes
+
+```{r}
+ggplot(data,aes(x= Age, fill = factor(Diabetes_012)))+
+         geom_bar(position = "dodge")+
+         coord_flip()+
+         labs(
+           title = "Diabetes by different ages",
+           x= "Age"
+         )
+```
+
+-   In this bar graph Diabetes is **strongly correlated** to age. The percentage of people with diabetes rises steadily as people age, with the **highest** frequency seen in those between the ages of **65-69**. Diabetes rates are significantly lower in younger age groups. This trend aligns with the established notion that aging is a significant risk factor for diabetes.
+
+```{r}
+age_dia <- data |>
+  group_by(Age) |>
+  summarise(
+    diabete_mean = mean(Diabetes_012==2)
+  )
+  
+ggplot(age_dia,aes(x= Age,y= diabete_mean,group=1,color= "diabete_mean"))+
+  geom_line()+
+  geom_point()+
+  labs(
+    title = "Diabete frequency between different Age group",
+    x = "Age",
+    y = "Mean of diabetes"
+  )+
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 45,hjust = 1))
+
+```
+
+-   This line plot show increase in diabetes rate along age group and age_group **70-74** has **highest** chance of diabetes risk.
+
+## Income vs Sex
+
+```{r}
+ggplot(data, aes(x= Income,fill = factor(Sex)))+
+  geom_bar(position = "dodge")+
+  labs(
+    title = "Income difference between Sex",
+    x = "Income"
+  )+
+  theme_minimal()
+  
+```
+
+## Income vs Diabetes
+
+```{r}
+inc_dia <- data |>
+  group_by(Income) |>
+  summarise(
+    diabetes_prob = mean(Diabetes_012 == 2))
+
+ggplot(inc_dia,aes(x= Income, y = diabetes_prob,group=1,color= "diabetes_prob"))+
+  geom_line()+
+  geom_point()+
+  labs(
+    title = "Income va Diabetes",
+    x = "income",
+    y = "Income Proportion with diabetes",
+    fill= "Diabetes"
+  )
+```
+
+-   This Line graph shows the lower income have **higher** diabetes frequency,This may reflect because disparities in healthcare access, lifestyle and diet.
+
+## Diabetes vs Sex
+
+```{r}
+ggplot(data,aes(x=Diabetes_012, fill = factor(Sex)))+
+  geom_bar(position = "dodge")+
+  labs(
+    title = "Diabetes between different Sex",
+    x = "Diabetes"
+  )+
+  theme_minimal()
+
+```
+
+# Health Behavior Vs Diabetes
+
+## Smoking Vs Diabetes
+
+```{r}
+ggplot(data,aes(x= factor(Smoker),fill= factor(Diabetes_012)))+
+  geom_bar(position = "dodge")+
+  labs(
+    title = "Smoking Vs Diabetes",
+    x = "Somker 1 and Non-somker 0",
+    fill= "Diabetes"
+  )
+  
+
+```
+
+-   Diabetes and smoking status have a **weak** correlation. Although there are some differences between smokers and non-smokers, these seem to be less significant than those related to age and BMI.
+
+## Heavy alcohol consumer Vs Diabetes
+
+```{r}
+ggplot(data,aes(x= factor(HvyAlcoholConsump), fill = factor(Diabetes_012)))+
+  geom_bar(position = "dodge")+
+  
+  labs(
+    title = "Alcoholconsumption Status Vs Diabetes",
+    x = "Heavy Alcohol Consumption",
+    fill = "Diabetes"
+    
+  )
+```
+
+-   While heavy drinkers have a **lower** percentage of diabetes than low-drinkers, this is probably due to influencing variables, especially age, rather than a protective effect of alcohol use.
+
+```{r}
+ggplot(data, aes(x= factor(HvyAlcoholConsump),fill= factor(Diabetes_012)))+
+  geom_bar(position = "fill")+
+  facet_wrap(~Age)+
+  coord_flip()+
+  labs(
+    title = "Heavy Alcohol Consumption Vs Diabetes by Age Group",
+    x = "Heavy Alcohol Consumption",
+    y = "frequency",
+    fill= "Diabetes"
+  )
+```
+
+## More Fruits Consumer Vs Diabetes
+
+```{r}
+ggplot(data, aes(x= factor(Fruits),fill = factor(Diabetes_012)))+
+  geom_bar(position = "dodge")+
+  labs(
+    title = "Fruit Consumption Vs Diabetes",
+    x = "Fruit Consumption 1 or more"
+  )
+```
+
+-   While more fruits consumption have a **higher** percentage of diabetes than low- fruits consumption, this is probably due to influencing variables, especially age, rather than a protective effect of fruits consume.
+
+```{r}
+ggplot(data, aes(x=factor(Veggies),fill= factor(Diabetes_012)))+
+  geom_bar(position = "dodge")+
+  labs(
+    title = "Veggies consumption Vs Diabetes",
+    x = "veggies"
+  )
+
+```
+
+-   While more veggies consumption have a **higher** percentage of diabetes than low- veggies consumption, this is probably due to influencing variables, especially age, rather than a protective effect of veggies consume.
+
+```{r}
+numeric_data <- data |>
+  select(where(is.numeric))
+
+cor_matrix <- cor(numeric_data)
+melted_corr <- melt(cor_matrix)
+
+ggplot(melted_corr, aes(x = Var1, y= Var2, fill = value))+
+  geom_tile()+
+  scale_fill_gradient2(low = "blue",high = "red",mid = "white",midpoint = 0)+
+  
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 45,hjust = 1))
+  
+```
+
+-   The **heatmap** shows the correlation between all numeric variables in the dataset. Strong positive correlation is indicated by **red**, negative correlation is indicated by **blue**, and weak or no correlation in **white**.
+
+# Developed Research Questions
+
+## 1) Which health-related factors and lifestyle are taking with likelihood of diabetes after accounting for socioeconomic characteristics and demographic?
+
+## 2) What effects do age and socioeconomic status have on the association between diabetes status and lifestyle choices?
+
+## 3) Do people with various diabetes statuses exhibit recognizable patterns in their health behaviors and access to healthcare?
+
+
+```{r}
+write.csv(data, "cleaned_diabetes_data.csv", row.names = FALSE)
+```
+

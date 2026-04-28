@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.25">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>MA7442 Assessment 1 - Task 2</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="Ma7442_A1T2_259050988_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Ma7442_A1T2_259050988_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="Ma7442_A1T2_259050988_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="Ma7442_A1T2_259050988_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="Ma7442_A1T2_259050988_files/libs/quarto-html/popper.min.js"></script>
+<script src="Ma7442_A1T2_259050988_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Ma7442_A1T2_259050988_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Ma7442_A1T2_259050988_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Ma7442_A1T2_259050988_files/libs/quarto-html/quarto-syntax-highlighting-7b89279ff1a6dce999919e0e67d4d9ec.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Ma7442_A1T2_259050988_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Ma7442_A1T2_259050988_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Ma7442_A1T2_259050988_files/libs/bootstrap/bootstrap-9e3ffae467580fdb927a41352e75a2e0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">MA7442 Assessment 1 - Task 2</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>The Objective of this task is to develop and eveluate predictive models to analys factors which are related with diabetes.To learn more about underlying data patterns and prediction accuracy, both supervised and unsupervised learning techniques were used.</p>
+<p>This includes :</p>
+<ul>
+<li>Logistic Regression</li>
+<li>Random Forest</li>
+<li>Decision Tree (interpretability)</li>
+<li>K-Means Clustering (unsupervised learning)</li>
+</ul>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(caret)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(randomForest)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(nnet)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(reshape2)</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(pROC)</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rpart)</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rpart.plot)</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(factoextra)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="aim-and-objectives" class="level2">
+<h2 class="anchored" data-anchor-id="aim-and-objectives">Aim and Objectives</h2>
+<p>The aim of this study is to analyse and predict the variables linked to adult diabetes using machine learning and statistical techniques. This entails identifying important biological and lifestyle predictors, assessing their relative significance, and using clustering techniques to investigate underlying patterns within the population.</p>
+<p>To accomplish this goal, the subsequent objectives were established:</p>
+<ul>
+<li><p>To ascertain critical biological and lifestyle determinants affecting diabetes through logistic regression and random forest methodologies.</p></li>
+<li><p>To evaluate the persistence of lifestyle behaviours as significant predictors of diabetes after adjusting for biological variables, including age and BMI.</p></li>
+<li><p>To use K-means clustering to find different groups in the population based on their health and lifestyle traits.</p></li>
+<li><p>To compare the number of people with diabetes in different clusters and find the groups that are most at risk.</p></li>
+<li><p>To assess the efficacy and comprehensibility of various modelling methodologies in forecasting diabetes outcomes.</p></li>
+</ul>
+</section>
+<section id="reasearch-questions" class="level2">
+<h2 class="anchored" data-anchor-id="reasearch-questions">Reasearch Questions</h2>
+<ul>
+<li><p>Which biological and lifestyle factors significantly predict the likelihood of diabetes among adults?</p></li>
+<li><p>Do lifestyle behaviours remain significant predictors of diabetes after controlling for biological factors such as age and BMI?</p></li>
+<li><p>Are there distinct clusters of individuals based on health and lifestyle characteristics, and how do these clusters differ in diabetes prevalence?</p></li>
+</ul>
+</section>
+<section id="reflective-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="reflective-analysis">Reflective Analysis</h2>
+<p>This Project applied multiple modeling techniques to analyse diabetes risk, each with its own set of strengths. Logistic regression made it easy to understand important predictors like BMI and age. Random forest, on the other hand, made predictions more accurate by finding more complicated relationships. The decision tree made it easier to understand by using simple decision rules, but it was less stable.</p>
+<p>K-means clustering helped find separate groups in the data, showing how diabetes risk varies between different groups of people. However, clustering necessitated meticulous selection of variables and the quantity of clusters.</p>
+<p>Class imbalance was a major problem with all of the models, which made it hard to accurately predict diabetes cases. Adding socioeconomic and lifestyle factors also raises ethical and EDI issues because these factors could introduce bias.</p>
+<p>In general, using a combination of different methods gave us a better picture of diabetes risk by balancing how well they predicted and how easy they were to understand.</p>
+<section id="rq1-which-biological-and-lifestyle-factors-significantly-predict-the-likelihood-of-diabetes-among-adults" class="level3">
+<h3 class="anchored" data-anchor-id="rq1-which-biological-and-lifestyle-factors-significantly-predict-the-likelihood-of-diabetes-among-adults">RQ1: Which biological and lifestyle factors significantly predict the likelihood of diabetes among adults?</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"~/data/cleaned_diabetes_data.csv"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(data)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  Diabetes_012 HighBP HighChol CholCheck BMI Smoker Stroke HeartDiseaseorAttack
+1            0      1        1         1  40      1      0                    0
+2            0      0        0         0  25      1      0                    0
+3            0      1        1         1  28      0      0                    0
+4            0      1        0         1  27      0      0                    0
+5            0      1        1         1  24      0      0                    0
+6            0      1        1         1  25      1      0                    0
+  PhysActivity Fruits Veggies HvyAlcoholConsump AnyHealthcare NoDocbcCost
+1            0      0       1                 0             1           0
+2            1      0       0                 0             0           1
+3            0      1       0                 0             1           1
+4            1      1       1                 0             1           0
+5            1      1       1                 0             1           0
+6            1      1       1                 0             1           0
+    GenHlth MentHlth PhysHlth DiffWalk Sex   Age              Education
+1      poor       18       15        1   0 60-64               Grade 12
+2      good        0        0        0   0 50-54       College graduate
+3      poor       30       30        1   0 60-64               Grade 12
+4 very good        0        0        0   0 70-74            Grades 9-11
+5 very good        3        0        0   0 70-74 College 1 year-3 years
+6 very good        0        2        0   1 65-69       College graduate
+    Income
+1 $15k-20K
+2    &lt;$10k
+3    +$75k
+4 $35k-40k
+5 $20k-25k
+6    +$75k</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span>Diabetes_012 <span class="ot">&lt;-</span> <span class="fu">factor</span>(data<span class="sc">$</span>Diabetes_012,</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>                            <span class="at">level =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>,<span class="dv">2</span>),</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>                            <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"NoDiabetes"</span>,<span class="st">"PreDiabetes"</span>,<span class="st">"Diabetes"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(data<span class="sc">$</span>Diabetes_012)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+ NoDiabetes PreDiabetes    Diabetes 
+     213703        4631       35346 </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">prop.table</span>(<span class="fu">table</span>(data<span class="sc">$</span>Diabetes_012))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+ NoDiabetes PreDiabetes    Diabetes 
+ 0.84241170  0.01825528  0.13933302 </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>model_data <span class="ot">&lt;-</span> data <span class="sc">|&gt;</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Diabetes_012,BMI,Age,Sex,HighBP,HighChol,PhysActivity,Fruits,Veggies,Smoker,HvyAlcoholConsump,Income,Education)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>trainIndex <span class="ot">&lt;-</span> <span class="fu">createDataPartition</span>(model_data<span class="sc">$</span>Diabetes_012, <span class="at">p =</span> <span class="fl">0.8</span>,<span class="at">list=</span> <span class="cn">FALSE</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>train_data <span class="ot">&lt;-</span> model_data[trainIndex,]</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>test_data <span class="ot">&lt;-</span> model_data[<span class="sc">-</span>trainIndex,]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>multi_model <span class="ot">&lt;-</span> <span class="fu">multinom</span>(Diabetes_012 <span class="sc">~</span> BMI<span class="sc">+</span>Age<span class="sc">+</span>Sex<span class="sc">+</span>PhysActivity<span class="sc">+</span>Fruits<span class="sc">+</span>Veggies<span class="sc">+</span>Smoker<span class="sc">+</span>HvyAlcoholConsump<span class="sc">+</span>Income<span class="sc">+</span>Education,<span class="at">data =</span>train_data)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># weights:  99 (64 variable)
+initial  value 222957.870925 
+iter  10 value 94391.369713
+iter  20 value 92717.120625
+iter  30 value 92117.823532
+iter  40 value 90747.548618
+iter  50 value 89876.026127
+iter  60 value 89209.813468
+iter  70 value 88127.288512
+iter  80 value 87654.605050
+final  value 87632.471178 
+converged</code></pre>
+</div>
+</div>
+<p><em>The traning model process shows a steady drop in the loss value from 222,957 to 87,632, which means that the model got better with each iteration. The optimisation worked, which means that the model found a stable solution. This shows that the model was trained well and can be used to make predictions.</em></p>
+</section>
+</section>
+<section id="summary-of-the-multiple-regression-model" class="level2">
+<h2 class="anchored" data-anchor-id="summary-of-the-multiple-regression-model">Summary of the Multiple Regression Model</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(multi_model)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Call:
+multinom(formula = Diabetes_012 ~ BMI + Age + Sex + PhysActivity + 
+    Fruits + Veggies + Smoker + HvyAlcoholConsump + Income + 
+    Education, data = train_data)
+
+Coefficients:
+            (Intercept)        BMI  Age25-29  Age30-34 Age35-39 Age40-44
+PreDiabetes   -7.167093 0.06534892 0.8365180 0.7698752 1.277001 1.289080
+Diabetes      -6.022538 0.08288785 0.2209406 0.6266788 1.253141 1.601303
+            Age45-49 Age50-54 Age55-59 Age60-64 Age65-69 Age70-74 Age75-79
+PreDiabetes 1.824713 1.828656 1.980572 2.179977 2.275225 2.459076 2.501411
+Diabetes    1.940766 2.277637 2.484803 2.762180 2.974826 3.087138 3.051602
+              Age80+       Sex PhysActivity      Fruits     Veggies     Smoker
+PreDiabetes 2.514908 0.1275671   -0.1435578 -0.05112430 -0.10316598 0.08092086
+Diabetes    2.934255 0.3330841   -0.2780136 -0.07383376 -0.06337551 0.10323800
+            HvyAlcoholConsump Income$15k-20K Income$20k-25k Income$25-35K
+PreDiabetes        -0.1513650    -0.09532344     -0.2228508    -0.2716695
+Diabetes           -0.8089054    -0.15353792     -0.2525078    -0.4444609
+            Income$35k-40k Income$40-75k Income+$75k Income&lt;$10k
+PreDiabetes     -0.3229925    -0.4519773  -0.7974368  0.21677225
+Diabetes        -0.5997484    -0.6916660  -0.9648883  0.06969054
+            EducationCollege graduate EducationGrade 12 EducationGrades 1-8
+PreDiabetes                -0.1228142       -0.04248563           0.5337676
+Diabetes                   -0.1656910       -0.01160480           0.3291401
+            EducationGrades 9-11
+PreDiabetes            0.2902437
+Diabetes               0.1795703
+            EducationNever attended school or\nonly kindergarten
+PreDiabetes                                           -0.4751205
+Diabetes                                               0.3648780
+
+Std. Errors:
+            (Intercept)          BMI  Age25-29  Age30-34  Age35-39  Age40-44
+PreDiabetes   0.2982993 0.0021876076 0.3188938 0.3084073 0.2949040 0.2927723
+Diabetes      0.1390734 0.0009988945 0.1641859 0.1471571 0.1391674 0.1362852
+             Age45-49  Age50-54  Age55-59  Age60-64  Age65-69  Age70-74
+PreDiabetes 0.2857299 0.2841023 0.2827825 0.2819619 0.2819364 0.2825563
+Diabetes    0.1342892 0.1329323 0.1324377 0.1321302 0.1320616 0.1323770
+             Age75-79    Age80+        Sex PhysActivity     Fruits    Veggies
+PreDiabetes 0.2840933 0.2837344 0.03484721   0.03749977 0.03612476 0.04167794
+Diabetes    0.1330312 0.1330960 0.01426946   0.01520883 0.01477781 0.01719600
+                Smoker HvyAlcoholConsump Income$15k-20K Income$20k-25k
+PreDiabetes 0.03452709         0.0815708     0.08349119     0.08179819
+Diabetes    0.01413760         0.0426699     0.03399413     0.03284216
+            Income$25-35K Income$35k-40k Income$40-75k Income+$75k Income&lt;$10k
+PreDiabetes    0.07891223     0.07615403    0.07739892  0.07706501  0.09000802
+Diabetes       0.03217875     0.03126714    0.03152591  0.03102759  0.03839794
+            EducationCollege graduate EducationGrade 12 EducationGrades 1-8
+PreDiabetes                 0.0448077        0.04456424          0.09794731
+Diabetes                    0.0183601        0.01804006          0.04500318
+            EducationGrades 9-11
+PreDiabetes           0.07516689
+Diabetes              0.03253369
+            EducationNever attended school or\nonly kindergarten
+PreDiabetes                                            0.7178180
+Diabetes                                               0.2077453
+
+Residual Deviance: 175264.9 
+AIC: 175392.9 </code></pre>
+</div>
+</div>
+<p><em>The results of the the multinomial logistic regression show that BMI and age are the best predictors of diabetes. Higher values of both of these factors make it much more likely that someone will have prediabetes or diabetes. A healthy diet (fruits and vegetables) and regular exercise are linked to a lower risk, while smoking has a small positive effect. Also, people who make more money and have more education are less likely to get diabetes. The model shows how biological, lifestyle, and socioeconomic factors all work together to affect diabetes outcomes.</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>z <span class="ot">&lt;-</span> <span class="fu">summary</span>(multi_model)<span class="sc">$</span>coefficients <span class="sc">/</span><span class="fu">summary</span>(multi_model)<span class="sc">$</span>standard.errors</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>p_values <span class="ot">&lt;-</span> (<span class="dv">1</span> <span class="sc">-</span><span class="fu">pnorm</span>(<span class="fu">abs</span>(z)))<span class="sc">*</span><span class="dv">2</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>p_values</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>            (Intercept) BMI    Age25-29     Age30-34     Age35-39     Age40-44
+PreDiabetes           0   0 0.008711155 1.254985e-02 1.489571e-05 1.067586e-05
+Diabetes              0   0 0.178407807 2.057383e-05 0.000000e+00 0.000000e+00
+                Age45-49     Age50-54     Age55-59     Age60-64     Age65-69
+PreDiabetes 1.701153e-10 1.221705e-10 2.489786e-12 1.065814e-14 6.661338e-16
+Diabetes    0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00 0.000000e+00
+            Age70-74 Age75-79 Age80+          Sex PhysActivity       Fruits
+PreDiabetes        0        0      0 0.0002514716 0.0001290678 1.570054e-01
+Diabetes           0        0      0 0.0000000000 0.0000000000 5.845297e-07
+                 Veggies       Smoker HvyAlcoholConsump Income$15k-20K
+PreDiabetes 0.0133119082 1.909395e-02        0.06350668   2.535711e-01
+Diabetes    0.0002282717 2.826628e-13        0.00000000   6.284021e-06
+            Income$20k-25k Income$25-35K Income$35k-40k Income$40-75k
+PreDiabetes   6.441897e-03  0.0005759819    2.22223e-05  5.233205e-09
+Diabetes      1.487699e-14  0.0000000000    0.00000e+00  0.000000e+00
+            Income+$75k Income&lt;$10k EducationCollege graduate EducationGrade 12
+PreDiabetes           0  0.01602411                0.00612678         0.3404092
+Diabetes              0  0.06953078                0.00000000         0.5200428
+            EducationGrades 1-8 EducationGrades 9-11
+PreDiabetes        5.050069e-08         1.127742e-04
+Diabetes           2.597922e-13         3.399323e-08
+            EducationNever attended school or\nonly kindergarten
+PreDiabetes                                           0.50803820
+Diabetes                                              0.07902485</code></pre>
+</div>
+</div>
+<p><em>The multinomial logistic regression demonstrate that age and BMI are highly significant predictors of diabetes, with higher risk being strongly correlated with older age groups. While smoking is positively correlated with an increased risk of diabetes, lifestyle factors like physical activity and vegetable consumption are statistically significant and linked to a lower risk. Fruit consumption is still important for diabetes but seems to be less important for prediabetes. Significant correlations are also found between socioeconomic factors, especially income and education, with higher levels typically associated with a lower risk of diabetes. Overall, the model demonstrates that diabetes outcomes are significantly influenced by biological, lifestyle, and socioeconomic factors.</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>pred_multi <span class="ot">&lt;-</span> <span class="fu">predict</span>(multi_model,<span class="at">newdata =</span> test_data)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<section id="summary-of-confusion-matrix-of-multiple-regression-model" class="level3">
+<h3 class="anchored" data-anchor-id="summary-of-confusion-matrix-of-multiple-regression-model">Summary of Confusion Matrix of Multiple Regression Model</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confusionMatrix</span>(pred_multi, test_data<span class="sc">$</span>Diabetes_012)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Confusion Matrix and Statistics
+
+             Reference
+Prediction    NoDiabetes PreDiabetes Diabetes
+  NoDiabetes       42248         892     6588
+  PreDiabetes          0           0        0
+  Diabetes           492          34      481
+
+Overall Statistics
+                                         
+               Accuracy : 0.8422         
+                 95% CI : (0.839, 0.8454)
+    No Information Rate : 0.8424         
+    P-Value [Acc &gt; NIR] : 0.5563         
+                                         
+                  Kappa : 0.0801         
+                                         
+ Mcnemar's Test P-Value : &lt;2e-16         
+
+Statistics by Class:
+
+                     Class: NoDiabetes Class: PreDiabetes Class: Diabetes
+Sensitivity                    0.98849            0.00000        0.068044
+Specificity                    0.06442            1.00000        0.987954
+Pos Pred Value                 0.84958                NaN        0.477656
+Neg Pred Value                 0.51142            0.98175        0.867519
+Prevalence                     0.84242            0.01825        0.139332
+Detection Rate                 0.83272            0.00000        0.009481
+Detection Prevalence           0.98015            0.00000        0.019848
+Balanced Accuracy              0.52645            0.50000        0.527999</code></pre>
+</div>
+</div>
+<p><em>The model’s high overall accuracy (84.2%) is mostly attributable to its accurate prediction of the majority class (No Diabetes) With zero sensitivity for pre-diabetes and extremely low sensitivity (6.8%) for diabetes, it does poorly for minority classes. This suggests that, despite its high specificity, the model has trouble accurately identifying people with diabetes. Weak overall predictive agreement beyond chance is further suggested by the low Kappa value (0.08). These findings demonstrate the effects of class imbalance, whereby the model is biased in favour of the majority class and is unable to identify high-risk groups.</em></p>
+</section>
+<section id="random-forest" class="level3">
+<h3 class="anchored" data-anchor-id="random-forest">Random Forest</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>rf_model <span class="ot">&lt;-</span> <span class="fu">randomForest</span>(Diabetes_012<span class="sc">~</span>.,</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>                         <span class="at">data=</span> train_data,</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>                         <span class="at">ntree =</span> <span class="dv">200</span>,</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>                         <span class="at">importance =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>rf_pred <span class="ot">&lt;-</span> <span class="fu">predict</span>(rf_model, test_data)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="confusion-matrix-on-random-forest" class="level3">
+<h3 class="anchored" data-anchor-id="confusion-matrix-on-random-forest">Confusion Matrix on Random Forest</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">confusionMatrix</span>(rf_pred, test_data<span class="sc">$</span>Diabetes_012)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Confusion Matrix and Statistics
+
+             Reference
+Prediction    NoDiabetes PreDiabetes Diabetes
+  NoDiabetes       42204         875     6371
+  PreDiabetes          0           0        0
+  Diabetes           536          51      698
+
+Overall Statistics
+                                          
+               Accuracy : 0.8456          
+                 95% CI : (0.8424, 0.8487)
+    No Information Rate : 0.8424          
+    P-Value [Acc &gt; NIR] : 0.02431         
+                                          
+                  Kappa : 0.1197          
+                                          
+ Mcnemar's Test P-Value : &lt; 2e-16         
+
+Statistics by Class:
+
+                     Class: NoDiabetes Class: PreDiabetes Class: Diabetes
+Sensitivity                    0.98746            0.00000         0.09874
+Specificity                    0.09368            1.00000         0.98656
+Pos Pred Value                 0.85347                NaN         0.54319
+Neg Pred Value                 0.58288            0.98175         0.87116
+Prevalence                     0.84242            0.01825         0.13933
+Detection Rate                 0.83185            0.00000         0.01376
+Detection Prevalence           0.97467            0.00000         0.02533
+Balanced Accuracy              0.54057            0.50000         0.54265</code></pre>
+</div>
+</div>
+<p><em>The model performs noticeably better than the no information rate, achieving a marginally higher overall accuracy of 84.6%. With a very high sensitivity, the model still does a good job of predicting the majority class (No Diabetes). Despite increased accuracy, it still has trouble with minority classes, displaying zero sensitivity for PreDiabetes and low sensitivity (9.9%) for Diabetes. Only a small amount of agreement beyond chance is indicated by the Kappa value (0.12). These findings imply that while there has been some progress, class imbalance is still a significant obstacle that limits the model’s capacity to correctly identify high-risk individuals.</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">varImpPlot</span>(rf_model)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Ma7442_A1T2_259050988_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><em>BMI is the most significant predictor of diabetes, followed by age, high cholesterol, and income, according to the random forest model’s variable importance plot. While lifestyle factors like fruit and vegetable consumption, physical activity, and smoking have a smaller but noticeable impact, blood pressure and education also make a moderate contribution to the model. The least significant factor seems to be heavy drinking. Overall, the findings show that clinical and biological factors are more important in predicting diabetes than lifestyle factors.</em></p>
+<section id="results" class="level4">
+<h4 class="anchored" data-anchor-id="results"><em>Results</em></h4>
+<p>The results from logistic regression and random forest models indicate that BMI and age are the strongest predictors of diabetes. Diabetes risk is consistently linked to higher BMI and older age groups. Healthy habits are associated with a lower risk, and lifestyle factors like diet and exercise also play a role. Socioeconomic variables like income and education also have a big impact; higher levels are typically linked to a lower prevalence of diabetes. In general, both lifestyle and biological factors are important, but biological factors are more significant.</p>
+</section>
+</section>
+<section id="rq2-do-lifestyle-behaviours-remain-significant-predictors-of-diabetes-after-controlling-for-biological-factors-such-as-age-and-bmi" class="level3">
+<h3 class="anchored" data-anchor-id="rq2-do-lifestyle-behaviours-remain-significant-predictors-of-diabetes-after-controlling-for-biological-factors-such-as-age-and-bmi">RQ2: Do lifestyle behaviours remain significant predictors of diabetes after controlling for biological factors such as age and BMI?</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">boxplot</span>(data<span class="sc">$</span>BMI)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Ma7442_A1T2_259050988_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>Q1 <span class="ot">&lt;-</span> <span class="fu">quantile</span>(data<span class="sc">$</span>BMI, <span class="fl">0.25</span>)</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>Q3 <span class="ot">&lt;-</span> <span class="fu">quantile</span>(data<span class="sc">$</span>BMI, <span class="fl">0.75</span>)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>IQR_Value <span class="ot">&lt;-</span> Q3 <span class="sc">-</span> Q1</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>lower_bound <span class="ot">&lt;-</span> Q1 <span class="sc">-</span> <span class="fl">1.5</span><span class="sc">*</span>IQR_Value</span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>Upper_bound <span class="ot">&lt;-</span> Q3 <span class="sc">+</span> <span class="fl">1.5</span> <span class="sc">*</span> IQR_Value</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>lower_bound</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> 25% 
+13.5 </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>Upper_bound</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> 75% 
+41.5 </code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="comparison-of-model-performance-with-and-without-outliers" class="level2">
+<h2 class="anchored" data-anchor-id="comparison-of-model-performance-with-and-without-outliers">Comparison of Model Performance With and Without Outliers</h2>
+<section id="removing-outlier-from-bmi" class="level3">
+<h3 class="anchored" data-anchor-id="removing-outlier-from-bmi">Removing Outlier from BMI</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>data_clean <span class="ot">&lt;-</span> data <span class="sc">|&gt;</span> <span class="fu">filter</span>(BMI <span class="sc">&gt;=</span> lower_bound <span class="sc">&amp;</span> BMI <span class="sc">&lt;=</span> Upper_bound)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">boxplot</span>(data_clean<span class="sc">$</span>BMI)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Ma7442_A1T2_259050988_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>data_clean<span class="sc">$</span>Diabetes_binary <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(data_clean<span class="sc">$</span>Diabetes_012 <span class="sc">==</span> <span class="st">"Diabetes"</span>,<span class="dv">1</span>,<span class="dv">0</span>)</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>data_clean<span class="sc">$</span>Diabetes_binary <span class="ot">&lt;-</span> <span class="fu">factor</span>(data_clean<span class="sc">$</span>Diabetes_binary,</span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>                               <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>                               <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"NoDiabetes"</span>,<span class="st">"Diabetes"</span>)</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>                               )</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(data_clean<span class="sc">$</span>Diabetes_binary)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+NoDiabetes   Diabetes 
+    211854      31979 </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>model_data2 <span class="ot">&lt;-</span> data_clean <span class="sc">|&gt;</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Diabetes_binary,BMI,Age,PhysActivity,Fruits,Veggies,Income)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>trainIndex <span class="ot">&lt;-</span> <span class="fu">createDataPartition</span>(model_data2<span class="sc">$</span>Diabetes_binary,</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">p =</span> <span class="fl">0.8</span>,</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">list =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>train_data <span class="ot">&lt;-</span> model_data2[trainIndex,]</span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>test_data <span class="ot">&lt;-</span> model_data2[<span class="sc">-</span>trainIndex,]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+<section id="summary-of-interaction-model" class="level3">
+<h3 class="anchored" data-anchor-id="summary-of-interaction-model">Summary of Interaction Model</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>interaction_model <span class="ot">&lt;-</span> <span class="fu">glm</span>(</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>  Diabetes_binary <span class="sc">~</span> BMI <span class="sc">+</span> Age <span class="sc">+</span> Income <span class="sc">+</span> PhysActivity <span class="sc">+</span> Fruits <span class="sc">+</span> Veggies <span class="sc">+</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a>    Age <span class="sc">:</span> PhysActivity <span class="sc">+</span> </span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a>    Income <span class="sc">:</span> PhysActivity <span class="sc">+</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a>    Age<span class="sc">:</span> Fruits,</span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> train_data,</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> <span class="st">"binomial"</span></span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(interaction_model)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+glm(formula = Diabetes_binary ~ BMI + Age + Income + PhysActivity + 
+    Fruits + Veggies + Age:PhysActivity + Income:PhysActivity + 
+    Age:Fruits, family = "binomial", data = train_data)
+
+Coefficients:
+                             Estimate Std. Error z value Pr(&gt;|z|)    
+(Intercept)                 -7.360395   0.375709 -19.591  &lt; 2e-16 ***
+BMI                          0.122396   0.001445  84.709  &lt; 2e-16 ***
+Age25-29                     0.407758   0.456046   0.894 0.371260    
+Age30-34                     1.098988   0.401631   2.736 0.006213 ** 
+Age35-39                     1.395554   0.387343   3.603 0.000315 ***
+Age40-44                     1.797747   0.380225   4.728 2.27e-06 ***
+Age45-49                     2.258845   0.376301   6.003 1.94e-09 ***
+Age50-54                     2.577706   0.373935   6.893 5.45e-12 ***
+Age55-59                     2.765683   0.373227   7.410 1.26e-13 ***
+Age60-64                     3.074146   0.372776   8.247  &lt; 2e-16 ***
+Age65-69                     3.305919   0.372674   8.871  &lt; 2e-16 ***
+Age70-74                     3.433115   0.373092   9.202  &lt; 2e-16 ***
+Age75-79                     3.364820   0.374041   8.996  &lt; 2e-16 ***
+Age80+                       3.350636   0.374336   8.951  &lt; 2e-16 ***
+Income$15k-20K              -0.170919   0.055002  -3.108 0.001887 ** 
+Income$20k-25k              -0.236723   0.053243  -4.446 8.75e-06 ***
+Income$25-35K               -0.395555   0.052599  -7.520 5.47e-14 ***
+Income$35k-40k              -0.593210   0.051585 -11.500  &lt; 2e-16 ***
+Income$40-75k               -0.700724   0.053052 -13.208  &lt; 2e-16 ***
+Income+$75k                 -0.833189   0.051345 -16.227  &lt; 2e-16 ***
+Income&lt;$10k                  0.033267   0.061604   0.540 0.589181    
+PhysActivity                -0.063273   0.375670  -0.168 0.866248    
+Fruits                       0.478854   0.288682   1.659 0.097165 .  
+Veggies                     -0.116224   0.017829  -6.519 7.09e-11 ***
+Age25-29:PhysActivity       -0.096810   0.461968  -0.210 0.834010    
+Age30-34:PhysActivity       -0.046462   0.408430  -0.114 0.909431    
+Age35-39:PhysActivity        0.021425   0.390341   0.055 0.956229    
+Age40-44:PhysActivity        0.015920   0.383094   0.042 0.966852    
+Age45-49:PhysActivity       -0.129941   0.378529  -0.343 0.731389    
+Age50-54:PhysActivity       -0.158667   0.375734  -0.422 0.672817    
+Age55-59:PhysActivity       -0.140624   0.374859  -0.375 0.707557    
+Age60-64:PhysActivity       -0.096431   0.374264  -0.258 0.796672    
+Age65-69:PhysActivity       -0.156982   0.374071  -0.420 0.674735    
+Age70-74:PhysActivity       -0.146460   0.374450  -0.391 0.695699    
+Age75-79:PhysActivity       -0.030335   0.375338  -0.081 0.935584    
+Age80+:PhysActivity         -0.048830   0.375136  -0.130 0.896434    
+Income$15k-20K:PhysActivity -0.061715   0.072472  -0.852 0.394456    
+Income$20k-25k:PhysActivity -0.053192   0.069579  -0.764 0.444579    
+Income$25-35K:PhysActivity  -0.104590   0.068051  -1.537 0.124312    
+Income$35k-40k:PhysActivity -0.071004   0.066106  -1.074 0.282777    
+Income$40-75k:PhysActivity  -0.072606   0.066976  -1.084 0.278339    
+Income+$75k:PhysActivity    -0.232475   0.064429  -3.608 0.000308 ***
+Income&lt;$10k:PhysActivity     0.033722   0.081567   0.413 0.679299    
+Age25-29:Fruits             -0.455844   0.369287  -1.234 0.217057    
+Age30-34:Fruits             -0.812659   0.324037  -2.508 0.012144 *  
+Age35-39:Fruits             -0.530996   0.307097  -1.729 0.083794 .  
+Age40-44:Fruits             -0.538812   0.300114  -1.795 0.072597 .  
+Age45-49:Fruits             -0.575219   0.295606  -1.946 0.051667 .  
+Age50-54:Fruits             -0.482409   0.292676  -1.648 0.099297 .  
+Age55-59:Fruits             -0.517723   0.291700  -1.775 0.075924 .  
+Age60-64:Fruits             -0.592184   0.290963  -2.035 0.041825 *  
+Age65-69:Fruits             -0.541146   0.290745  -1.861 0.062710 .  
+Age70-74:Fruits             -0.561674   0.291336  -1.928 0.053864 .  
+Age75-79:Fruits             -0.615860   0.292755  -2.104 0.035407 *  
+Age80+:Fruits               -0.636071   0.293209  -2.169 0.030057 *  
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 151597  on 195067  degrees of freedom
+Residual deviance: 131141  on 195013  degrees of freedom
+AIC: 131251
+
+Number of Fisher Scoring iterations: 7</code></pre>
+</div>
+</div>
+<p><em>The logistic regression model with interaction terms shows that BMI and age remain strongest predictors of diabetes, confirming their dominant influence.Certain lifestyle factors remain significant even after adjusting for these biological factors. Specifically, fruit consumption becomes significant when it interacts with age, indicating that its effect varies across age groups, whereas vegetable consumption exhibits a significant negative association with diabetes risk. When age and BMI are taken into account, physical activity may have a smaller effect because it is not statistically significant on its own. Furthermore, income is still a powerful predictor, with lower diabetes risk being linked to higher income levels. Overall, the findings show that although lifestyle choices do raise the risk of diabetes, their effects are lessened when biological factors are taken into consideration.</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>plot_data <span class="ot">&lt;-</span> data_clean <span class="sc">|&gt;</span></span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Income, PhysActivity, Diabetes_binary) <span class="sc">|&gt;</span></span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">count =</span> <span class="fu">n</span>()) <span class="sc">|&gt;</span></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Income, PhysActivity) <span class="sc">|&gt;</span></span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prop =</span> count <span class="sc">/</span> <span class="fu">sum</span>(count))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>`summarise()` has grouped output by 'Income', 'PhysActivity'. You can override
+using the `.groups` argument.</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(plot_data, <span class="fu">aes</span>(<span class="at">x =</span> Income, <span class="at">y =</span> prop, <span class="at">fill =</span> Diabetes_binary)) <span class="sc">+</span></span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>, <span class="at">position =</span> <span class="st">"stack"</span>) <span class="sc">+</span></span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>PhysActivity) <span class="sc">+</span></span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()<span class="sc">+</span></span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Ma7442_A1T2_259050988_files/figure-html/unnamed-chunk-25-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><em>Diabetes prevalence is higher in lower income groups and declines with increasing income, according to the chart. This highlights the significance of socioeconomic factors in diabetes risk by showing that people with higher income levels are less likely to have diabetes.</em></p>
+</section>
+<section id="creation-of-binary-target-variable" class="level3">
+<h3 class="anchored" data-anchor-id="creation-of-binary-target-variable">Creation of Binary Target Variable</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span>Diabetes_binary <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(data<span class="sc">$</span>Diabetes_012 <span class="sc">==</span> <span class="st">"Diabetes"</span>, <span class="dv">1</span>,<span class="dv">0</span>)</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>data<span class="sc">$</span>Diabetes_binary <span class="ot">&lt;-</span> <span class="fu">factor</span>(data<span class="sc">$</span>Diabetes_binary,</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>                               <span class="at">levels=</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>                               <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"NoDiabetes"</span>,<span class="st">"Diabetes"</span>))</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>data_clean<span class="sc">$</span>Diabetes_binary <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(data_clean<span class="sc">$</span>Diabetes_012 <span class="sc">==</span> <span class="st">"Diabetes"</span>,<span class="dv">1</span>,<span class="dv">0</span>)</span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>data_clean<span class="sc">$</span>Diabetes_binary <span class="ot">&lt;-</span> <span class="fu">factor</span>(data_clean<span class="sc">$</span>Diabetes_binary,</span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>                               <span class="at">levels=</span> <span class="fu">c</span>(<span class="dv">0</span>,<span class="dv">1</span>),</span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>                               <span class="at">labels =</span> <span class="fu">c</span>(<span class="st">"NoDiabetes"</span>,<span class="st">"Diabetes"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>Vars <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Diabetes_binary"</span>, <span class="st">"BMI"</span>,<span class="st">"Age"</span>, <span class="st">"Income"</span>,<span class="st">"PhysActivity"</span>,<span class="st">"Fruits"</span>,<span class="st">"Veggies"</span>)</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>model_data_orig <span class="ot">&lt;-</span> data[, Vars]</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>model_data_clean <span class="ot">&lt;-</span> data_clean[,Vars]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-3"><a href="#cb44-3" aria-hidden="true" tabindex="-1"></a>trainIndex1 <span class="ot">&lt;-</span> <span class="fu">createDataPartition</span>(model_data_orig<span class="sc">$</span>Diabetes_binary, <span class="at">p =</span> <span class="fl">0.8</span>, <span class="at">list =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb44-4"><a href="#cb44-4" aria-hidden="true" tabindex="-1"></a>train_orig <span class="ot">&lt;-</span> model_data_orig[trainIndex1,]</span>
+<span id="cb44-5"><a href="#cb44-5" aria-hidden="true" tabindex="-1"></a>test_orig <span class="ot">&lt;-</span> model_data_orig[<span class="sc">-</span>trainIndex1,]</span>
+<span id="cb44-6"><a href="#cb44-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb44-7"><a href="#cb44-7" aria-hidden="true" tabindex="-1"></a>trainIndex2 <span class="ot">&lt;-</span> <span class="fu">createDataPartition</span>(model_data_clean<span class="sc">$</span>Diabetes_binary, <span class="at">p =</span> <span class="fl">0.8</span>, <span class="at">list =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb44-8"><a href="#cb44-8" aria-hidden="true" tabindex="-1"></a>train_clean <span class="ot">&lt;-</span> model_data_clean[trainIndex2,]</span>
+<span id="cb44-9"><a href="#cb44-9" aria-hidden="true" tabindex="-1"></a>test_clean <span class="ot">&lt;-</span> model_data_clean[<span class="sc">-</span>trainIndex2,]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>log_orig <span class="ot">&lt;-</span> <span class="fu">glm</span>(Diabetes_binary <span class="sc">~</span> .,<span class="at">data=</span> train_orig,<span class="at">family =</span> <span class="st">"binomial"</span>)</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>log_clean <span class="ot">&lt;-</span> <span class="fu">glm</span>(Diabetes_binary <span class="sc">~</span> .,<span class="at">data=</span> train_clean,<span class="at">family =</span> <span class="st">"binomial"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>pred_log_orig <span class="ot">&lt;-</span> <span class="fu">predict</span>(log_orig, test_orig, <span class="at">type=</span> <span class="st">"response"</span>)</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>pred_log_clean <span class="ot">&lt;-</span> <span class="fu">predict</span>(log_clean, test_clean, <span class="at">type =</span><span class="st">"response"</span>)</span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>pred_log_orig_class <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(pred_log_orig <span class="sc">&gt;</span> <span class="fl">0.5</span>, <span class="st">"Diabetes"</span>, <span class="st">"NoDiabetes"</span>)</span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>pred_log_clean_class <span class="ot">&lt;-</span> <span class="fu">ifelse</span>(pred_log_clean<span class="sc">&gt;</span><span class="fl">0.5</span>, <span class="st">"Diabetes"</span>, <span class="st">"NoDiabetes"</span>)</span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>pred_log_orig_class <span class="ot">&lt;-</span> <span class="fu">factor</span>(pred_log_orig_class, <span class="at">level=</span> <span class="fu">c</span>(<span class="st">"Nodiabetes"</span>, <span class="st">"Diabetes"</span>))</span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>pred_log_clean_class <span class="ot">&lt;-</span> <span class="fu">factor</span>(pred_log_clean_class, <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"NoDiabetes"</span>, <span class="st">"Diabetes"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>rf_orig <span class="ot">&lt;-</span> <span class="fu">randomForest</span>(Diabetes_binary<span class="sc">~</span>., <span class="at">data =</span> train_orig, <span class="at">ntree=</span> <span class="dv">200</span>)</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>rf_clean <span class="ot">&lt;-</span> <span class="fu">randomForest</span>(Diabetes_binary<span class="sc">~</span>., <span class="at">data=</span> train_clean, <span class="at">ntree =</span> <span class="dv">200</span>)</span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>pred_rf_orig <span class="ot">&lt;-</span> <span class="fu">predict</span>(rf_orig, test_orig)</span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a>pred_rf_clean <span class="ot">&lt;-</span> <span class="fu">predict</span>(rf_clean, test_clean)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>cm_log_orig <span class="ot">&lt;-</span> <span class="fu">confusionMatrix</span>(pred_log_orig_class, test_orig<span class="sc">$</span>Diabetes_binary)</span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>cm_log_clean <span class="ot">&lt;-</span> <span class="fu">confusionMatrix</span>(pred_log_clean_class,test_clean<span class="sc">$</span>Diabetes_binary)</span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>cm_rf_orig <span class="ot">&lt;-</span> <span class="fu">confusionMatrix</span>(pred_rf_orig,test_orig<span class="sc">$</span>Diabetes_binary)</span>
+<span id="cb48-5"><a href="#cb48-5" aria-hidden="true" tabindex="-1"></a>cm_rf_clean <span class="ot">&lt;-</span> <span class="fu">confusionMatrix</span>(pred_rf_clean, test_clean<span class="sc">$</span>Diabetes_binary)</span>
+<span id="cb48-6"><a href="#cb48-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb48-7"><a href="#cb48-7" aria-hidden="true" tabindex="-1"></a>cm_log_orig</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Confusion Matrix and Statistics
+
+            Reference
+Prediction   NoDiabetes Diabetes
+  NoDiabetes          0        0
+  Diabetes          452      387
+                                          
+               Accuracy : 0.4613          
+                 95% CI : (0.4271, 0.4957)
+    No Information Rate : 0.5387          
+    P-Value [Acc &gt; NIR] : 1               
+                                          
+                  Kappa : 0               
+                                          
+ Mcnemar's Test P-Value : &lt;2e-16          
+                                          
+            Sensitivity : 0.0000          
+            Specificity : 1.0000          
+         Pos Pred Value :    NaN          
+         Neg Pred Value : 0.4613          
+             Prevalence : 0.5387          
+         Detection Rate : 0.0000          
+   Detection Prevalence : 0.0000          
+      Balanced Accuracy : 0.5000          
+                                          
+       'Positive' Class : NoDiabetes      
+                                          </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>cm_log_clean</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Confusion Matrix and Statistics
+
+            Reference
+Prediction   NoDiabetes Diabetes
+  NoDiabetes      41999     6089
+  Diabetes          371      306
+                                          
+               Accuracy : 0.8675          
+                 95% CI : (0.8645, 0.8705)
+    No Information Rate : 0.8689          
+    P-Value [Acc &gt; NIR] : 0.8103          
+                                          
+                  Kappa : 0.063           
+                                          
+ Mcnemar's Test P-Value : &lt;2e-16          
+                                          
+            Sensitivity : 0.99124         
+            Specificity : 0.04785         
+         Pos Pred Value : 0.87338         
+         Neg Pred Value : 0.45199         
+             Prevalence : 0.86886         
+         Detection Rate : 0.86125         
+   Detection Prevalence : 0.98612         
+      Balanced Accuracy : 0.51955         
+                                          
+       'Positive' Class : NoDiabetes      
+                                          </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>cm_rf_orig</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Confusion Matrix and Statistics
+
+            Reference
+Prediction   NoDiabetes Diabetes
+  NoDiabetes      43619     6985
+  Diabetes           47       84
+                                          
+               Accuracy : 0.8614          
+                 95% CI : (0.8584, 0.8644)
+    No Information Rate : 0.8607          
+    P-Value [Acc &gt; NIR] : 0.3203          
+                                          
+                  Kappa : 0.0184          
+                                          
+ Mcnemar's Test P-Value : &lt;2e-16          
+                                          
+            Sensitivity : 0.99892         
+            Specificity : 0.01188         
+         Pos Pred Value : 0.86197         
+         Neg Pred Value : 0.64122         
+             Prevalence : 0.86067         
+         Detection Rate : 0.85974         
+   Detection Prevalence : 0.99742         
+      Balanced Accuracy : 0.50540         
+                                          
+       'Positive' Class : NoDiabetes      
+                                          </code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>cm_rf_clean</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Confusion Matrix and Statistics
+
+            Reference
+Prediction   NoDiabetes Diabetes
+  NoDiabetes      42351     6377
+  Diabetes           19       18
+                                          
+               Accuracy : 0.8688          
+                 95% CI : (0.8658, 0.8718)
+    No Information Rate : 0.8689          
+    P-Value [Acc &gt; NIR] : 0.5087          
+                                          
+                  Kappa : 0.0041          
+                                          
+ Mcnemar's Test P-Value : &lt;2e-16          
+                                          
+            Sensitivity : 0.999552        
+            Specificity : 0.002815        
+         Pos Pred Value : 0.869131        
+         Neg Pred Value : 0.486486        
+             Prevalence : 0.868861        
+         Detection Rate : 0.868471        
+   Detection Prevalence : 0.999241        
+      Balanced Accuracy : 0.501183        
+                                          
+       'Positive' Class : NoDiabetes      
+                                          </code></pre>
+</div>
+</div>
+<p><em>The model evaluation results show that the model is very accurate overall (about 86–87%), but this is not true because the classes are not balanced. The models do a great job of predicting the majority class (No Diabetes), with very high sensitivity. However, they do a bad job of finding actual diabetes cases, as shown by very low specificity and balanced accuracy close to 0.5. In some situations, the model doesn’t even try to predict the minority class. In general, the results show that the models favour the majority class and don’t work well for reliably finding diabetes.</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">Model =</span> <span class="fu">c</span>(<span class="st">"logistic (Original)"</span>, <span class="st">"Logistic (Clean)"</span>,</span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>            <span class="st">"RF (Original)"</span>, <span class="st">"RF (Clean)"</span>),</span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">Accuracy =</span> <span class="fu">c</span>(</span>
+<span id="cb56-5"><a href="#cb56-5" aria-hidden="true" tabindex="-1"></a>    cm_log_orig<span class="sc">$</span>overall[<span class="st">"Accuracy"</span>],</span>
+<span id="cb56-6"><a href="#cb56-6" aria-hidden="true" tabindex="-1"></a>    cm_log_clean<span class="sc">$</span>overall[<span class="st">"Accuracy"</span>],</span>
+<span id="cb56-7"><a href="#cb56-7" aria-hidden="true" tabindex="-1"></a>    cm_rf_orig<span class="sc">$</span>overall[<span class="st">"Accuracy"</span>],</span>
+<span id="cb56-8"><a href="#cb56-8" aria-hidden="true" tabindex="-1"></a>    cm_rf_clean<span class="sc">$</span>overall[<span class="st">"Accuracy"</span>]</span>
+<span id="cb56-9"><a href="#cb56-9" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb56-10"><a href="#cb56-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb56-11"><a href="#cb56-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb56-12"><a href="#cb56-12" aria-hidden="true" tabindex="-1"></a>results</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                Model  Accuracy
+1 logistic (Original) 0.4612634
+2    Logistic (Clean) 0.8675279
+3       RF (Original) 0.8613975
+4          RF (Clean) 0.8688404</code></pre>
+</div>
+</div>
+<p><em>The comparison of the models shows that cleaning the data made a big difference in performance. For both the logistic regression and random forest models, accuracy went up from 46% to about 86–87%. The cleaned random forest model had the highest accuracy of all the models (86.87%), and the cleaned logistic model came in a close second. The results show that, overall, data preprocessing had a bigger effect on performance than the choice of model.</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(results,<span class="fu">aes</span>(<span class="at">x=</span>Model, <span class="at">y=</span> Accuracy,))<span class="sc">+</span></span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat=</span> <span class="st">"identity"</span>,<span class="at">fill=</span> <span class="st">"lightgreen"</span> )<span class="sc">+</span></span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb58-4"><a href="#cb58-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Model Performance Comparison"</span>,</span>
+<span id="cb58-5"><a href="#cb58-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Accuracy"</span></span>
+<span id="cb58-6"><a href="#cb58-6" aria-hidden="true" tabindex="-1"></a>  )<span class="sc">+</span></span>
+<span id="cb58-7"><a href="#cb58-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Ma7442_A1T2_259050988_files/figure-html/unnamed-chunk-34-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>tree_model <span class="ot">&lt;-</span> <span class="fu">rpart</span>(Diabetes_binary<span class="sc">~</span> BMI <span class="sc">+</span> Age<span class="sc">+</span>Income<span class="sc">+</span>PhysActivity<span class="sc">+</span>Fruits<span class="sc">+</span>Veggies,</span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>                    <span class="at">data =</span> train_data,</span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>                    <span class="at">method =</span> <span class="st">"class"</span>,</span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>                    <span class="at">parms =</span> <span class="fu">list</span>(<span class="at">prior =</span> <span class="fu">c</span>(<span class="fl">0.5</span>,<span class="fl">0.5</span>))</span>
+<span id="cb59-5"><a href="#cb59-5" aria-hidden="true" tabindex="-1"></a>                    )</span>
+<span id="cb59-6"><a href="#cb59-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb59-7"><a href="#cb59-7" aria-hidden="true" tabindex="-1"></a><span class="fu">rpart.plot</span>(tree_model,</span>
+<span id="cb59-8"><a href="#cb59-8" aria-hidden="true" tabindex="-1"></a>           <span class="at">main =</span> <span class="st">"Decision Tree for Diabetes Prediction"</span>,</span>
+<span id="cb59-9"><a href="#cb59-9" aria-hidden="true" tabindex="-1"></a>           <span class="at">type =</span> <span class="dv">2</span>,</span>
+<span id="cb59-10"><a href="#cb59-10" aria-hidden="true" tabindex="-1"></a>           <span class="at">extra=</span> <span class="dv">104</span>,</span>
+<span id="cb59-11"><a href="#cb59-11" aria-hidden="true" tabindex="-1"></a>           <span class="at">fallen.leaves =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb59-12"><a href="#cb59-12" aria-hidden="true" tabindex="-1"></a>           <span class="at">box.palette =</span> <span class="st">"Greens"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Ma7442_A1T2_259050988_files/figure-html/unnamed-chunk-35-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><em>The decision tree says that age and BMI are the two most important things to look at when trying to figure out if someone has diabetes. People who are older and have a higher BMI are more likely to have diabetes. Income is another factor, with people who make less money being more likely to get sick. The tree shows how biological and socioeconomic factors work together to affect diabetes outcomes.</em></p>
+</section>
+<section id="result" class="level3">
+<h3 class="anchored" data-anchor-id="result"><em>Result</em></h3>
+<p>The findings for RQ2 demonstrate that lifestyle behaviors influence diabetes risk; however, their significance diminishes when adjusting for age and BMI. Although factors like eating vegetables and certain lifestyle interactions are still statistically significant, biological factors, especially age and BMI, are the best indicators of diabetes. Additionally, socioeconomic factors, such as income, remain significant, with higher income correlating to reduced risk. Overall, the results show that biological and socioeconomic factors have a bigger effect on diabetes outcomes than lifestyle choices.</p>
+</section>
+<section id="rq3-are-there-distinct-clusters-of-individuals-based-on-health-and-lifestyle-characteristics-and-how-do-these-clusters-differ-in-diabetes-prevalence" class="level3">
+<h3 class="anchored" data-anchor-id="rq3-are-there-distinct-clusters-of-individuals-based-on-health-and-lifestyle-characteristics-and-how-do-these-clusters-differ-in-diabetes-prevalence">RQ3: Are there distinct clusters of individuals based on health and lifestyle characteristics, and how do these clusters differ in diabetes prevalence?</h3>
+</section>
+<section id="prepare-clustering-dataset" class="level3">
+<h3 class="anchored" data-anchor-id="prepare-clustering-dataset">Prepare Clustering dataset</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>cluster_data <span class="ot">&lt;-</span> data_clean[, <span class="fu">c</span>(<span class="st">"BMI"</span>, <span class="st">"Age"</span>, <span class="st">"Income"</span>,<span class="st">"PhysActivity"</span>,<span class="st">"Fruits"</span>,<span class="st">"Veggies"</span>)]</span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>cluster_data<span class="sc">$</span>Age <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">as.factor</span>(cluster_data<span class="sc">$</span>Age))</span>
+<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a>cluster_data<span class="sc">$</span>Income <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">as.factor</span>(cluster_data<span class="sc">$</span>Income))</span>
+<span id="cb60-5"><a href="#cb60-5" aria-hidden="true" tabindex="-1"></a>cluster_data<span class="sc">$</span>PhysActivity <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">as.factor</span>(cluster_data<span class="sc">$</span>PhysActivity))</span>
+<span id="cb60-6"><a href="#cb60-6" aria-hidden="true" tabindex="-1"></a>cluster_data<span class="sc">$</span>Fruits <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">as.factor</span>(cluster_data<span class="sc">$</span>Fruits))</span>
+<span id="cb60-7"><a href="#cb60-7" aria-hidden="true" tabindex="-1"></a>cluster_data<span class="sc">$</span>Veggies <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(<span class="fu">as.factor</span>(cluster_data<span class="sc">$</span>Veggies))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>cluster_scaled <span class="ot">&lt;-</span> <span class="fu">scale</span>(cluster_data)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>wss <span class="ot">&lt;-</span> <span class="fu">numeric</span>(<span class="dv">10</span>)</span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>){</span>
+<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a>  wss[i] <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(cluster_scaled, <span class="at">centers =</span> i, <span class="at">nstart=</span> <span class="dv">10</span>)<span class="sc">$</span>tot.withinss</span>
+<span id="cb62-5"><a href="#cb62-5" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb62-6"><a href="#cb62-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb62-7"><a href="#cb62-7" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>, wss, <span class="at">type =</span> <span class="st">"b"</span>,</span>
+<span id="cb62-8"><a href="#cb62-8" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Number of Clusters"</span>,</span>
+<span id="cb62-9"><a href="#cb62-9" aria-hidden="true" tabindex="-1"></a>     <span class="at">ylab =</span> <span class="st">"Within Sum of Squares"</span>,</span>
+<span id="cb62-10"><a href="#cb62-10" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Elbow Method "</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Ma7442_A1T2_259050988_files/figure-html/unnamed-chunk-38-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><em>The elbow method graph shows that the sum of squares within each cluster goes down clearly as the number of clusters goes up. But the rate of decrease starts to slow down around 3 clusters, which is the “elbow point.” This means that choosing 3 clusters is the best option because adding more clusters doesn’t make the model work much better.</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>kmeans_model <span class="ot">&lt;-</span> <span class="fu">kmeans</span>(cluster_scaled, <span class="at">centers =</span> <span class="dv">3</span>, <span class="at">nstart=</span> <span class="dv">25</span>)</span>
+<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb63-4"><a href="#cb63-4" aria-hidden="true" tabindex="-1"></a><span class="fu">fviz_cluster</span>(kmeans_model, <span class="at">data=</span> cluster_scaled,</span>
+<span id="cb63-5"><a href="#cb63-5" aria-hidden="true" tabindex="-1"></a>             <span class="at">main =</span> <span class="st">"K-Mean Clustering of Individuals"</span></span>
+<span id="cb63-6"><a href="#cb63-6" aria-hidden="true" tabindex="-1"></a>             )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Ma7442_A1T2_259050988_files/figure-html/unnamed-chunk-39-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><em>The K-means clustering results indicate that individuals are categorized into three distinct clusters according to their characteristics. There is some overlap between clusters, but there are clear patterns that show differences in profiles like age, BMI, and lifestyle factors. These clusters help find groups of people who have similar risk patterns. These groups can then be studied more closely to see how they are related to diabetes outcomes.</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>data_clean<span class="sc">$</span>Cluster <span class="ot">&lt;-</span> <span class="fu">factor</span>(kmeans_model<span class="sc">$</span>cluster)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb65"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(data_clean, <span class="fu">aes</span>(<span class="at">x=</span> BMI, <span class="at">y=</span> Age, <span class="at">color=</span> Cluster))<span class="sc">+</span></span>
+<span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>)<span class="sc">+</span></span>
+<span id="cb65-3"><a href="#cb65-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb65-4"><a href="#cb65-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Cluster Distribution of Individuals"</span>,</span>
+<span id="cb65-5"><a href="#cb65-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"BMI"</span>,</span>
+<span id="cb65-6"><a href="#cb65-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">" Age in Numeric"</span></span>
+<span id="cb65-7"><a href="#cb65-7" aria-hidden="true" tabindex="-1"></a>  )<span class="sc">+</span></span>
+<span id="cb65-8"><a href="#cb65-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Ma7442_A1T2_259050988_files/figure-html/unnamed-chunk-41-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><em>The clustering analysis revealed three distinct groups of individuals characterized by varying risk profiles. When we look at these clusters and diabetes outcomes, one of them has a higher percentage of people with diabetes. This means that this group is at a higher risk. This cluster is mostly made up of people who are older and have a higher BMI. People in lower-risk clusters tend to have healthier profiles. The clustering results show important patterns in the data and show how different groups’ diabetes risk is affected by combinations of biological and lifestyle factors.</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a>data_clean<span class="sc">$</span>Diabetes_binary <span class="ot">&lt;-</span> <span class="fu">factor</span>(data_clean<span class="sc">$</span>Diabetes_binary)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb67"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a>cluster_summary <span class="ot">&lt;-</span> <span class="fu">table</span>(data_clean<span class="sc">$</span>Cluster, data_clean<span class="sc">$</span>Diabetes_binary)</span>
+<span id="cb67-2"><a href="#cb67-2" aria-hidden="true" tabindex="-1"></a>cluster_summary</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   
+    NoDiabetes Diabetes
+  1      32881     7715
+  2      37696     7735
+  3     141277    16529</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb69"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a>cluster_prop <span class="ot">&lt;-</span> <span class="fu">prop.table</span>(cluster_summary, <span class="at">margin =</span> <span class="dv">1</span>)</span>
+<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a>cluster_prop</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   
+    NoDiabetes  Diabetes
+  1  0.8099566 0.1900434
+  2  0.8297418 0.1702582
+  3  0.8952575 0.1047425</code></pre>
+</div>
+</div>
+<p><em>When you compare clusters with diabetes outcomes, you can see that Cluster 1 has the most diabetes cases (19%), followed by Cluster 2 (17%), and Cluster 3 has the fewest (10%). This means that people in Cluster 1 are the most at risk, probably because they are older and have a higher BMI. Cluster 3, on the other hand, is a group with a lower risk and healthier profiles. The clustering analysis effectively delineates distinct groups exhibiting diverse levels of diabetes risk.</em></p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>cluster_df <span class="ot">&lt;-</span> <span class="fu">as.data.frame</span>(cluster_prop)</span>
+<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(cluster_df) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Cluster"</span>, <span class="st">"Diabetes"</span>, <span class="st">"Proportion"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(cluster_df,<span class="fu">aes</span>(<span class="at">x =</span> Cluster, <span class="at">y=</span> Proportion, <span class="at">fill =</span> Diabetes))<span class="sc">+</span></span>
+<span id="cb72-2"><a href="#cb72-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_col</span>(<span class="at">position =</span> <span class="st">"dodge"</span>)<span class="sc">+</span></span>
+<span id="cb72-3"><a href="#cb72-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"#A8E6A3"</span>,<span class="st">"#FF9999"</span>))<span class="sc">+</span></span>
+<span id="cb72-4"><a href="#cb72-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb72-5"><a href="#cb72-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Diabetes Distribution Across Clusters"</span>,</span>
+<span id="cb72-6"><a href="#cb72-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Cluster"</span>,</span>
+<span id="cb72-7"><a href="#cb72-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Proportion"</span></span>
+<span id="cb72-8"><a href="#cb72-8" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb72-9"><a href="#cb72-9" aria-hidden="true" tabindex="-1"></a>  )<span class="sc">+</span></span>
+<span id="cb72-10"><a href="#cb72-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Ma7442_A1T2_259050988_files/figure-html/unnamed-chunk-46-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="result-1" class="level3">
+<h3 class="anchored" data-anchor-id="result-1"><em>Result</em></h3>
+<p>The clustering analysis identified three distinct groups with f=different diabetes risk levels. <strong>Cluster 1</strong> showsthe highest diabetes prevalence followed by <strong>Cluster 2</strong>. <strong>Cluster 3</strong> has the lowest risk,The results show that people can be put into meaningful groups based on their traits, and that some of these groups are more likely to get diabetes than others. In general, clustering gives us useful information about population risk patterns that traditional models don’t.</p>
+</section>
+<section id="methodology" class="level3">
+<h3 class="anchored" data-anchor-id="methodology">Methodology</h3>
+<p>K-means clustering was applied using selected variables including BMI, age, income, physical activity, and dietary habitsTo facilitate clustering, factor encoding was used to transform categorical variables into numerical form. To guarantee that each variable contributed equally to the distance calculations, all variables were standardized before analysis.The elbow method, which assesses the within-cluster sum of squares (WSS), was used to determine the ideal number of clusters. Three clusters (k = 3) were chosen based on the observed pattern.</p>
+</section>
+<section id="discussion" class="level3">
+<h3 class="anchored" data-anchor-id="discussion">Discussion</h3>
+<p>The results of this study demonstrate how important biological, lifestyle, and socioeconomic factors are in determining the risk of diabetes. Age and BMI were consistently found to be the best predictors in every model, demonstrating their significant influence on diabetes outcomes [1]. Diabetes risk was also linked to lifestyle factors like diet and physical activity, but these effects diminished when age and BMI were taken into account, indicating that biological factors may be more significant [2]. The prevalence of diabetes was clearly correlated with socioeconomic status, especially income, with lower risk associated with higher income levels [3]. The notion that risk is not evenly distributed was further supported by clustering analysis, which identified distinct groups within the population, with one cluster showing a higher proportion of diabetes cases [4].Class imbalance made it difficult for the models to accurately predict minority classes, despite their high accuracy [5]. All things considered, the findings offer insightful information about the intricate interactions between variables that lead to diabetes and emphasize the necessity of focused interventions.</p>
+<p>Furthermore, the trade-off between interpretability and predictive performance is highlighted by comparing various modeling approaches. Logistic regression is helpful for comprehending relationships within the data because it gave clear insights into the significance of individual variables. By capturing intricate, non-linear interactions, the random forest model, on the other hand, attained marginally higher accuracy at the expense of decreased interpretability. Although it was less stable and more likely to be biased in favor of the majority class, the decision tree provided a balance by graphically representing decision rules. These variations highlight how crucial it is to choose the right models based on the goal of the study [7]. Combining interpretable and high-performing models can yield meaningful insights for decision-making as well as accurate predictions for healthcare applications [6].</p>
+</section>
+<section id="references" class="level3">
+<h3 class="anchored" data-anchor-id="references">References</h3>
+<p>[1] World Health Organization, “Diabetes,” WHO, 2023.</p>
+<p>[2] Centers for Disease Control and Prevention, “National Diabetes Statistics Report,” CDC, 2022.</p>
+<p>[3] American Diabetes Association, “Standards of Medical Care in Diabetes,” Diabetes Care, vol.&nbsp;46, no. 1, 2023.</p>
+<p>[4] J. Han, M. Kamber, and J. Pei, Data Mining: Concepts and Techniques, 3rd ed.&nbsp;Morgan Kaufmann, 2011.</p>
+<p>[5] H. He and E. A. Garcia, “Learning from imbalanced data,” IEEE Trans. on Knowledge and Data Engineering, vol.&nbsp;21, no. 9, pp.&nbsp;1263–1284, 2009.</p>
+<p>[6] World Health Organization, “Diabetes,” WHO, 2023.</p>
+<p>[7] J. Han, M. Kamber, and J. Pei, Data Mining: Concepts and Techniques, 3rd ed.&nbsp;Morgan Kaufmann, 2011.</p>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

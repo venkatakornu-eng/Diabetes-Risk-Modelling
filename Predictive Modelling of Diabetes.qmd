@@ -1,0 +1,509 @@
+---
+title: "MA7442 Assessment 1 - Task 2"
+format: html
+editor: visual
+---
+
+## Introduction
+
+The Objective of this task is to develop and eveluate predictive models to analys factors which are related with diabetes.To learn more about underlying data patterns and prediction accuracy, both supervised and unsupervised learning techniques were used.
+
+This includes :
+
+-   Logistic Regression
+-   Random Forest
+-   Decision Tree (interpretability)
+-   K-Means Clustering (unsupervised learning)
+
+```{r}
+#| warning: false
+library(tidyverse)
+library(caret)
+library(randomForest)
+library(nnet)
+library(reshape2)
+library(pROC)
+library(ggplot2)
+library(rpart)
+library(rpart.plot)
+library(factoextra)
+```
+
+## Aim and Objectives
+
+The aim of this study is to analyse and predict the variables linked to adult diabetes using machine learning and statistical techniques. This entails identifying important biological and lifestyle predictors, assessing their relative significance, and using clustering techniques to investigate underlying patterns within the population.
+
+To accomplish this goal, the subsequent objectives were established:
+
+-   To ascertain critical biological and lifestyle determinants affecting diabetes through logistic regression and random forest methodologies.
+
+-   To evaluate the persistence of lifestyle behaviours as significant predictors of diabetes after adjusting for biological variables, including age and BMI.
+
+-   To use K-means clustering to find different groups in the population based on their health and lifestyle traits.
+
+-   To compare the number of people with diabetes in different clusters and find the groups that are most at risk.
+
+-   To assess the efficacy and comprehensibility of various modelling methodologies in forecasting diabetes outcomes.
+
+## Reasearch Questions
+
+-   Which biological and lifestyle factors significantly predict the likelihood of diabetes among adults?
+
+-   Do lifestyle behaviours remain significant predictors of diabetes after controlling for biological factors such as age and BMI?
+
+-   Are there distinct clusters of individuals based on health and lifestyle characteristics, and how do these clusters differ in diabetes prevalence?
+
+## Reflective Analysis
+
+This Project applied multiple modeling techniques to analyse diabetes risk, each with its own set of strengths. Logistic regression made it easy to understand important predictors like BMI and age. Random forest, on the other hand, made predictions more accurate by finding more complicated relationships. The decision tree made it easier to understand by using simple decision rules, but it was less stable.
+
+K-means clustering helped find separate groups in the data, showing how diabetes risk varies between different groups of people. However, clustering necessitated meticulous selection of variables and the quantity of clusters.
+
+Class imbalance was a major problem with all of the models, which made it hard to accurately predict diabetes cases. Adding socioeconomic and lifestyle factors also raises ethical and EDI issues because these factors could introduce bias.
+
+In general, using a combination of different methods gave us a better picture of diabetes risk by balancing how well they predicted and how easy they were to understand.
+
+### RQ1: Which biological and lifestyle factors significantly predict the likelihood of diabetes among adults?
+
+```{r}
+data <- read.csv("~/data/cleaned_diabetes_data.csv")
+```
+
+```{r}
+head(data)
+```
+
+```{r}
+data$Diabetes_012 <- factor(data$Diabetes_012,
+                            level = c(0,1,2),
+                            labels = c("NoDiabetes","PreDiabetes","Diabetes"))
+
+```
+
+```{r}
+table(data$Diabetes_012)
+prop.table(table(data$Diabetes_012))
+```
+
+```{r}
+model_data <- data |>
+  select(Diabetes_012,BMI,Age,Sex,HighBP,HighChol,PhysActivity,Fruits,Veggies,Smoker,HvyAlcoholConsump,Income,Education)
+```
+
+```{r}
+set.seed(123)
+
+trainIndex <- createDataPartition(model_data$Diabetes_012, p = 0.8,list= FALSE)
+
+train_data <- model_data[trainIndex,]
+test_data <- model_data[-trainIndex,]
+
+```
+
+```{r}
+multi_model <- multinom(Diabetes_012 ~ BMI+Age+Sex+PhysActivity+Fruits+Veggies+Smoker+HvyAlcoholConsump+Income+Education,data =train_data)
+```
+
+*The traning model process shows a steady drop in the loss value from 222,957 to 87,632, which means that the model got better with each iteration. The optimisation worked, which means that the model found a stable solution. This shows that the model was trained well and can be used to make predictions.*
+
+## Summary of the Multiple Regression Model
+
+```{r}
+summary(multi_model)
+```
+
+*The results of the the multinomial logistic regression show that BMI and age are the best predictors of diabetes. Higher values of both of these factors make it much more likely that someone will have prediabetes or diabetes. A healthy diet (fruits and vegetables) and regular exercise are linked to a lower risk, while smoking has a small positive effect. Also, people who make more money and have more education are less likely to get diabetes. The model shows how biological, lifestyle, and socioeconomic factors all work together to affect diabetes outcomes.*
+
+```{r}
+z <- summary(multi_model)$coefficients /summary(multi_model)$standard.errors
+
+p_values <- (1 -pnorm(abs(z)))*2
+p_values
+```
+
+*The multinomial logistic regression demonstrate that age and BMI are highly significant predictors of diabetes, with higher risk being strongly correlated with older age groups. While smoking is positively correlated with an increased risk of diabetes, lifestyle factors like physical activity and vegetable consumption are statistically significant and linked to a lower risk. Fruit consumption is still important for diabetes but seems to be less important for prediabetes. Significant correlations are also found between socioeconomic factors, especially income and education, with higher levels typically associated with a lower risk of diabetes. Overall, the model demonstrates that diabetes outcomes are significantly influenced by biological, lifestyle, and socioeconomic factors.*
+
+```{r}
+pred_multi <- predict(multi_model,newdata = test_data)
+```
+
+### Summary of Confusion Matrix of Multiple Regression Model 
+```{r}
+confusionMatrix(pred_multi, test_data$Diabetes_012)
+```
+
+*The model's high overall accuracy (84.2%) is mostly attributable to its accurate prediction of the majority class (No Diabetes) With zero sensitivity for pre-diabetes and extremely low sensitivity (6.8%) for diabetes, it does poorly for minority classes. This suggests that, despite its high specificity, the model has trouble accurately identifying people with diabetes. Weak overall predictive agreement beyond chance is further suggested by the low Kappa value (0.08). These findings demonstrate the effects of class imbalance, whereby the model is biased in favour of the majority class and is unable to identify high-risk groups.*
+
+### Random Forest
+```{r}
+rf_model <- randomForest(Diabetes_012~.,
+                         data= train_data,
+                         ntree = 200,
+                         importance = TRUE)
+```
+
+```{r}
+rf_pred <- predict(rf_model, test_data)
+```
+
+### Confusion Matrix on Random Forest
+```{r}
+confusionMatrix(rf_pred, test_data$Diabetes_012)
+```
+
+*The model performs noticeably better than the no information rate, achieving a marginally higher overall accuracy of 84.6%. With a very high sensitivity, the model still does a good job of predicting the majority class (No Diabetes). Despite increased accuracy, it still has trouble with minority classes, displaying zero sensitivity for PreDiabetes and low sensitivity (9.9%) for Diabetes. Only a small amount of agreement beyond chance is indicated by the Kappa value (0.12). These findings imply that while there has been some progress, class imbalance is still a significant obstacle that limits the model's capacity to correctly identify high-risk individuals.*
+
+```{r}
+varImpPlot(rf_model)
+```
+
+*BMI is the most significant predictor of diabetes, followed by age, high cholesterol, and income, according to the random forest model's variable importance plot. While lifestyle factors like fruit and vegetable consumption, physical activity, and smoking have a smaller but noticeable impact, blood pressure and education also make a moderate contribution to the model. The least significant factor seems to be heavy drinking. Overall, the findings show that clinical and biological factors are more important in predicting diabetes than lifestyle factors.*
+
+#### *Results*
+
+The results from logistic regression and random forest models indicate that BMI and age are the strongest predictors of diabetes. Diabetes risk is consistently linked to higher BMI and older age groups. Healthy habits are associated with a lower risk, and lifestyle factors like diet and exercise also play a role. Socioeconomic variables like income and education also have a big impact; higher levels are typically linked to a lower prevalence of diabetes. In general, both lifestyle and biological factors are important, but biological factors are more significant.
+
+### RQ2: Do lifestyle behaviours remain significant predictors of diabetes after controlling for biological factors such as age and BMI?
+
+```{r}
+boxplot(data$BMI)
+```
+
+```{r}
+Q1 <- quantile(data$BMI, 0.25)
+Q3 <- quantile(data$BMI, 0.75)
+
+IQR_Value <- Q3 - Q1
+
+lower_bound <- Q1 - 1.5*IQR_Value
+Upper_bound <- Q3 + 1.5 * IQR_Value
+
+lower_bound
+Upper_bound
+```
+## Comparison of Model Performance With and Without Outliers
+
+### Removing Outlier from BMI
+```{r}
+data_clean <- data |> filter(BMI >= lower_bound & BMI <= Upper_bound)
+```
+
+```{r}
+boxplot(data_clean$BMI)
+```
+
+```{r}
+data_clean$Diabetes_binary <- ifelse(data_clean$Diabetes_012 == "Diabetes",1,0)
+data_clean$Diabetes_binary <- factor(data_clean$Diabetes_binary,
+                               levels = c(0,1),
+                               labels = c("NoDiabetes","Diabetes")
+                               )
+table(data_clean$Diabetes_binary)
+```
+
+```{r}
+model_data2 <- data_clean |>
+  select(Diabetes_binary,BMI,Age,PhysActivity,Fruits,Veggies,Income)
+```
+
+```{r}
+set.seed(123)
+
+trainIndex <- createDataPartition(model_data2$Diabetes_binary,
+                                   p = 0.8,
+                                   list = FALSE)
+train_data <- model_data2[trainIndex,]
+test_data <- model_data2[-trainIndex,]
+```
+
+### Summary of Interaction Model 
+```{r}
+interaction_model <- glm(
+  Diabetes_binary ~ BMI + Age + Income + PhysActivity + Fruits + Veggies +
+    Age : PhysActivity + 
+    Income : PhysActivity +
+    Age: Fruits,
+  data = train_data,
+  family = "binomial"
+  
+)
+
+summary(interaction_model)
+```
+
+*The logistic regression model with interaction terms shows that BMI and age remain strongest predictors of diabetes, confirming their dominant influence.Certain lifestyle factors remain significant even after adjusting for these biological factors. Specifically, fruit consumption becomes significant when it interacts with age, indicating that its effect varies across age groups, whereas vegetable consumption exhibits a significant negative association with diabetes risk. When age and BMI are taken into account, physical activity may have a smaller effect because it is not statistically significant on its own. Furthermore, income is still a powerful predictor, with lower diabetes risk being linked to higher income levels. Overall, the findings show that although lifestyle choices do raise the risk of diabetes, their effects are lessened when biological factors are taken into consideration.*
+
+```{r}
+
+plot_data <- data_clean |>
+  group_by(Income, PhysActivity, Diabetes_binary) |>
+  summarise(count = n()) |>
+  group_by(Income, PhysActivity) |>
+  mutate(prop = count / sum(count))
+
+ggplot(plot_data, aes(x = Income, y = prop, fill = Diabetes_binary)) +
+  geom_bar(stat = "identity", position = "stack") +
+  facet_wrap(~PhysActivity) +
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+*Diabetes prevalence is higher in lower income groups and declines with increasing income, according to the chart. This highlights the significance of socioeconomic factors in diabetes risk by showing that people with higher income levels are less likely to have diabetes.*
+
+### Creation of Binary Target Variable
+```{r}
+data$Diabetes_binary <- ifelse(data$Diabetes_012 == "Diabetes", 1,0)
+data$Diabetes_binary <- factor(data$Diabetes_binary,
+                               levels= c(0,1),
+                               labels = c("NoDiabetes","Diabetes"))
+
+data_clean$Diabetes_binary <- ifelse(data_clean$Diabetes_012 == "Diabetes",1,0)
+data_clean$Diabetes_binary <- factor(data_clean$Diabetes_binary,
+                               levels= c(0,1),
+                               labels = c("NoDiabetes","Diabetes"))
+
+```
+
+```{r}
+Vars <- c("Diabetes_binary", "BMI","Age", "Income","PhysActivity","Fruits","Veggies")
+
+model_data_orig <- data[, Vars]
+model_data_clean <- data_clean[,Vars]
+```
+
+```{r}
+set.seed(123)
+
+trainIndex1 <- createDataPartition(model_data_orig$Diabetes_binary, p = 0.8, list = FALSE)
+train_orig <- model_data_orig[trainIndex1,]
+test_orig <- model_data_orig[-trainIndex1,]
+
+trainIndex2 <- createDataPartition(model_data_clean$Diabetes_binary, p = 0.8, list = FALSE)
+train_clean <- model_data_clean[trainIndex2,]
+test_clean <- model_data_clean[-trainIndex2,]
+
+```
+
+```{r}
+log_orig <- glm(Diabetes_binary ~ .,data= train_orig,family = "binomial")
+
+log_clean <- glm(Diabetes_binary ~ .,data= train_clean,family = "binomial")
+
+```
+
+```{r}
+pred_log_orig <- predict(log_orig, test_orig, type= "response")
+pred_log_clean <- predict(log_clean, test_clean, type ="response")
+
+pred_log_orig_class <- ifelse(pred_log_orig > 0.5, "Diabetes", "NoDiabetes")
+pred_log_clean_class <- ifelse(pred_log_clean>0.5, "Diabetes", "NoDiabetes")
+
+pred_log_orig_class <- factor(pred_log_orig_class, level= c("Nodiabetes", "Diabetes"))
+
+pred_log_clean_class <- factor(pred_log_clean_class, levels = c("NoDiabetes", "Diabetes"))
+```
+
+```{r}
+rf_orig <- randomForest(Diabetes_binary~., data = train_orig, ntree= 200)
+
+rf_clean <- randomForest(Diabetes_binary~., data= train_clean, ntree = 200)
+
+pred_rf_orig <- predict(rf_orig, test_orig)
+pred_rf_clean <- predict(rf_clean, test_clean)
+```
+
+
+```{r}
+#| warning: false
+cm_log_orig <- confusionMatrix(pred_log_orig_class, test_orig$Diabetes_binary)
+cm_log_clean <- confusionMatrix(pred_log_clean_class,test_clean$Diabetes_binary)
+
+cm_rf_orig <- confusionMatrix(pred_rf_orig,test_orig$Diabetes_binary)
+cm_rf_clean <- confusionMatrix(pred_rf_clean, test_clean$Diabetes_binary)
+
+cm_log_orig
+cm_log_clean
+cm_rf_orig
+cm_rf_clean
+```
+
+*The model evaluation results show that the model is very accurate overall (about 86–87%), but this is not true because the classes are not balanced. The models do a great job of predicting the majority class (No Diabetes), with very high sensitivity. However, they do a bad job of finding actual diabetes cases, as shown by very low specificity and balanced accuracy close to 0.5. In some situations, the model doesn't even try to predict the minority class. In general, the results show that the models favour the majority class and don't work well for reliably finding diabetes.*
+
+```{r}
+results <- data.frame(
+  Model = c("logistic (Original)", "Logistic (Clean)",
+            "RF (Original)", "RF (Clean)"),
+  Accuracy = c(
+    cm_log_orig$overall["Accuracy"],
+    cm_log_clean$overall["Accuracy"],
+    cm_rf_orig$overall["Accuracy"],
+    cm_rf_clean$overall["Accuracy"]
+  )
+)
+
+results
+            
+```
+
+*The comparison of the models shows that cleaning the data made a big difference in performance. For both the logistic regression and random forest models, accuracy went up from 46% to about 86–87%. The cleaned random forest model had the highest accuracy of all the models (86.87%), and the cleaned logistic model came in a close second. The results show that, overall, data preprocessing had a bigger effect on performance than the choice of model.*
+
+```{r}
+ggplot(results,aes(x=Model, y= Accuracy,))+
+  geom_bar(stat= "identity",fill= "lightgreen" )+
+  labs(
+    title = "Model Performance Comparison",
+    y = "Accuracy"
+  )+
+  theme_minimal()
+  
+```
+
+```{r}
+tree_model <- rpart(Diabetes_binary~ BMI + Age+Income+PhysActivity+Fruits+Veggies,
+                    data = train_data,
+                    method = "class",
+                    parms = list(prior = c(0.5,0.5))
+                    )
+
+rpart.plot(tree_model,
+           main = "Decision Tree for Diabetes Prediction",
+           type = 2,
+           extra= 104,
+           fallen.leaves = TRUE,
+           box.palette = "Greens")
+```
+
+*The decision tree says that age and BMI are the two most important things to look at when trying to figure out if someone has diabetes. People who are older and have a higher BMI are more likely to have diabetes. Income is another factor, with people who make less money being more likely to get sick. The tree shows how biological and socioeconomic factors work together to affect diabetes outcomes.*
+
+### *Result*
+
+The findings for RQ2 demonstrate that lifestyle behaviors influence diabetes risk; however, their significance diminishes when adjusting for age and BMI. Although factors like eating vegetables and certain lifestyle interactions are still statistically significant, biological factors, especially age and BMI, are the best indicators of diabetes. Additionally, socioeconomic factors, such as income, remain significant, with higher income correlating to reduced risk. Overall, the results show that biological and socioeconomic factors have a bigger effect on diabetes outcomes than lifestyle choices.
+
+### RQ3: Are there distinct clusters of individuals based on health and lifestyle characteristics, and how do these clusters differ in diabetes prevalence?
+
+### Prepare Clustering dataset
+
+```{r}
+cluster_data <- data_clean[, c("BMI", "Age", "Income","PhysActivity","Fruits","Veggies")]
+
+cluster_data$Age <- as.numeric(as.factor(cluster_data$Age))
+cluster_data$Income <- as.numeric(as.factor(cluster_data$Income))
+cluster_data$PhysActivity <- as.numeric(as.factor(cluster_data$PhysActivity))
+cluster_data$Fruits <- as.numeric(as.factor(cluster_data$Fruits))
+cluster_data$Veggies <- as.numeric(as.factor(cluster_data$Veggies))
+```
+
+```{r}
+cluster_scaled <- scale(cluster_data)
+
+```
+
+```{r}
+wss <- numeric(10)
+
+for(i in 1:10){
+  wss[i] <- kmeans(cluster_scaled, centers = i, nstart= 10)$tot.withinss
+}
+
+plot(1:10, wss, type = "b",
+     xlab = "Number of Clusters",
+     ylab = "Within Sum of Squares",
+     main = "Elbow Method ")
+     
+```
+
+*The elbow method graph shows that the sum of squares within each cluster goes down clearly as the number of clusters goes up. But the rate of decrease starts to slow down around 3 clusters, which is the "elbow point." This means that choosing 3 clusters is the best option because adding more clusters doesn't make the model work much better.*
+
+```{r}
+set.seed(123)
+kmeans_model <- kmeans(cluster_scaled, centers = 3, nstart= 25)
+
+fviz_cluster(kmeans_model, data= cluster_scaled,
+             main = "K-Mean Clustering of Individuals"
+             )
+
+```
+
+*The K-means clustering results indicate that individuals are categorized into three distinct clusters according to their characteristics. There is some overlap between clusters, but there are clear patterns that show differences in profiles like age, BMI, and lifestyle factors. These clusters help find groups of people who have similar risk patterns. These groups can then be studied more closely to see how they are related to diabetes outcomes.*
+
+```{r}
+data_clean$Cluster <- factor(kmeans_model$cluster)
+```
+
+```{r}
+
+ggplot(data_clean, aes(x= BMI, y= Age, color= Cluster))+
+  geom_point(alpha = 0.5)+
+  labs(
+    title = "Cluster Distribution of Individuals",
+    x = "BMI",
+    y = " Age in Numeric"
+  )+
+  theme_minimal()
+```
+
+*The clustering analysis revealed three distinct groups of individuals characterized by varying risk profiles. When we look at these clusters and diabetes outcomes, one of them has a higher percentage of people with diabetes. This means that this group is at a higher risk. This cluster is mostly made up of people who are older and have a higher BMI. People in lower-risk clusters tend to have healthier profiles. The clustering results show important patterns in the data and show how different groups' diabetes risk is affected by combinations of biological and lifestyle factors.*
+
+```{r}
+data_clean$Diabetes_binary <- factor(data_clean$Diabetes_binary)
+```
+
+```{r}
+cluster_summary <- table(data_clean$Cluster, data_clean$Diabetes_binary)
+cluster_summary
+```
+
+```{r}
+cluster_prop <- prop.table(cluster_summary, margin = 1)
+cluster_prop
+```
+
+*When you compare clusters with diabetes outcomes, you can see that Cluster 1 has the most diabetes cases (19%), followed by Cluster 2 (17%), and Cluster 3 has the fewest (10%). This means that people in Cluster 1 are the most at risk, probably because they are older and have a higher BMI. Cluster 3, on the other hand, is a group with a lower risk and healthier profiles. The clustering analysis effectively delineates distinct groups exhibiting diverse levels of diabetes risk.*
+
+```{r}
+cluster_df <- as.data.frame(cluster_prop)
+colnames(cluster_df) <- c("Cluster", "Diabetes", "Proportion")
+```
+
+```{r}
+ggplot(cluster_df,aes(x = Cluster, y= Proportion, fill = Diabetes))+
+  geom_col(position = "dodge")+
+  scale_fill_manual(values = c("#A8E6A3","#FF9999"))+
+  labs(
+    title = "Diabetes Distribution Across Clusters",
+    x = "Cluster",
+    y = "Proportion"
+  
+  )+
+  theme_minimal()
+```
+
+### *Result*
+
+The clustering analysis identified three distinct groups with f=different diabetes risk levels. **Cluster 1** showsthe highest diabetes prevalence followed by **Cluster 2**. **Cluster 3** has the lowest risk,The results show that people can be put into meaningful groups based on their traits, and that some of these groups are more likely to get diabetes than others. In general, clustering gives us useful information about population risk patterns that traditional models don't.
+
+### Methodology
+
+K-means clustering was applied using selected variables including BMI, age, income, physical activity, and dietary habitsTo facilitate clustering, factor encoding was used to transform categorical variables into numerical form. To guarantee that each variable contributed equally to the distance calculations, all variables were standardized before analysis.The elbow method, which assesses the within-cluster sum of squares (WSS), was used to determine the ideal number of clusters. Three clusters (k = 3) were chosen based on the observed pattern.
+
+### Discussion
+
+The results of this study demonstrate how important biological, lifestyle, and socioeconomic factors are in determining the risk of diabetes. Age and BMI were consistently found to be the best predictors in every model, demonstrating their significant influence on diabetes outcomes \[1\]. Diabetes risk was also linked to lifestyle factors like diet and physical activity, but these effects diminished when age and BMI were taken into account, indicating that biological factors may be more significant \[2\]. The prevalence of diabetes was clearly correlated with socioeconomic status, especially income, with lower risk associated with higher income levels \[3\]. The notion that risk is not evenly distributed was further supported by clustering analysis, which identified distinct groups within the population, with one cluster showing a higher proportion of diabetes cases \[4\].Class imbalance made it difficult for the models to accurately predict minority classes, despite their high accuracy \[5\]. All things considered, the findings offer insightful information about the intricate interactions between variables that lead to diabetes and emphasize the necessity of focused interventions.
+
+Furthermore, the trade-off between interpretability and predictive performance is highlighted by comparing various modeling approaches. Logistic regression is helpful for comprehending relationships within the data because it gave clear insights into the significance of individual variables. By capturing intricate, non-linear interactions, the random forest model, on the other hand, attained marginally higher accuracy at the expense of decreased interpretability. Although it was less stable and more likely to be biased in favor of the majority class, the decision tree provided a balance by graphically representing decision rules. These variations highlight how crucial it is to choose the right models based on the goal of the study \[7\]. Combining interpretable and high-performing models can yield meaningful insights for decision-making as well as accurate predictions for healthcare applications \[6\].
+
+### References
+
+\[1\] World Health Organization, “Diabetes,” WHO, 2023.
+
+\[2\] Centers for Disease Control and Prevention, “National Diabetes Statistics Report,” CDC, 2022.
+
+\[3\] American Diabetes Association, “Standards of Medical Care in Diabetes,” Diabetes Care, vol. 46, no. 1, 2023.
+
+\[4\] J. Han, M. Kamber, and J. Pei, Data Mining: Concepts and Techniques, 3rd ed. Morgan Kaufmann, 2011.
+
+\[5\] H. He and E. A. Garcia, “Learning from imbalanced data,” IEEE Trans. on Knowledge and Data Engineering, vol. 21, no. 9, pp. 1263–1284, 2009.
+
+\[6\] World Health Organization, “Diabetes,” WHO, 2023.
+
+\[7\] J. Han, M. Kamber, and J. Pei, Data Mining: Concepts and Techniques, 3rd ed. Morgan Kaufmann, 2011.
