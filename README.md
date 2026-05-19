@@ -67,7 +67,7 @@ diabetes-risk-modelling/
 │
 │── outputs/
 │   ├── plots/
-│   ├── model_results
+│   ├── model_results/
 │
 │── report/
 │   ├── final_report.Rmd
