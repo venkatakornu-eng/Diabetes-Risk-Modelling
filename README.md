@@ -35,7 +35,7 @@ The workflow follows an end-to-end data science pipeline, including data preproc
 
 The dataset consists of health survey data containing demographic, lifestyle, and medical attributes.
 
-### 🎯 Target Variable
+## 🎯 Target Variable
 
 **Diabetes_012**
 
@@ -43,7 +43,7 @@ The dataset consists of health survey data containing demographic, lifestyle, an
 * 1 → Prediabetes
 * 2 → Diabetes
 
-### 🔍 Key Features
+## 🔍 Key Features
 
 * Demographic: Age, Income, Education
 * Biological: BMI
